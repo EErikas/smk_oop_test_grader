@@ -4,6 +4,7 @@ from shutil import rmtree, copy2
 from tests2 import perform_tests
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
+submissions_dir = os.path.join(base_dir, 'submissions')
 ex_points = [4, 3, 4, 2, 2, 3, 7]
 
 
@@ -31,8 +32,7 @@ def prepare_for_grading(directory):
         copy2(file, grading_dir)
 
 
-def list_students(groups=['KZA', 'PRM'], verbose_output=False):
-    submissions_dir = os.path.join(base_dir, 'submissions')
+def list_students(groups, verbose_output=False):
     for group in groups:
         if verbose_output:
             print('\n{}:'.format(group))
@@ -64,9 +64,19 @@ def list_students(groups=['KZA', 'PRM'], verbose_output=False):
 
 
 if __name__ == '__main__':
+    groups = ['KZA', 'PRM']
     show_results = True
-    print('* Grading submissions...')
-    if show_results:
-        print('{:-^40}'.format('Results'))
-    list_students(verbose_output=show_results)
-    print('* Done!')
+    # Check submissions if submission folder exists
+    if os.path.exists(submissions_dir):
+        print('* Grading submissions...')
+        if show_results:
+            print('{:-^40}'.format('Results'))
+        list_students(groups, verbose_output=show_results)
+        print('* Done!')
+    # Create submission folder structure
+    else:
+        print('Creating submission directory structure... ')
+        os.mkdir(submissions_dir)
+        for group in groups:
+            os.mkdir(os.path.join(submissions_dir, group))
+        print('* Done!')
