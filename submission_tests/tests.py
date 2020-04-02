@@ -1,5 +1,6 @@
 from importlib import reload
-from correct_answers import ex1, ex2, ex3, ex4, ex5, ex6, ex7
+from submission_tests.correct_answers import ex1, ex2, ex5
+from submission_tests.correct_answers import ex3, ex4, ex7, ex6
 
 
 def check_ex_1():

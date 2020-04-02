@@ -2,7 +2,7 @@ import os
 import csv
 from shutil import rmtree, copy2
 import xlsxwriter
-from tests2 import perform_tests
+from submission_tests.tests2 import perform_tests
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 submissions_dir = os.path.join(base_dir, 'submissions')

@@ -203,3 +203,5 @@ results/
 *.csv
 *.xls
 .idea/*
+.DS_Store
+*.docx
