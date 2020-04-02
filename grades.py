@@ -1,20 +1,38 @@
 import os
 import csv
 from shutil import rmtree, copy2
+import xlsxwriter
 from tests2 import perform_tests
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 submissions_dir = os.path.join(base_dir, 'submissions')
+results_dir = os.path.join(base_dir, 'results')
 ex_points = [4, 3, 4, 2, 2, 3, 7]
 
 
-def write_results(filename, extension, data, delimiter=','):
-    results_dir = os.path.join(base_dir, 'results')
+def write_results_csv(filename, extension, data, delimiter=','):
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
     with open(os.path.join(results_dir, '{}_results.{}'.format(filename, extension)), 'w', encoding='utf-8') as file:
         writer = csv.writer(file, delimiter=delimiter)
         writer.writerows(data)
+
+
+def write_results_xlsx(groups_data):
+    workbook = xlsxwriter.Workbook(os.path.join(results_dir, 'results.xlsx'))
+    for group_data in groups_data:
+        # Get group name and results
+        group_name, group_results = tuple(group_data.items())[0]
+        worksheet = workbook.add_worksheet(group_name)
+        worksheet.set_column('A:A', 25)
+        for row in range(len(group_results)):
+            for col in range(len(group_results[row])):
+                data_to_write = [row, col, group_results[row][col]]
+                if row == 0 or col == 0:
+                    worksheet.write(*data_to_write)
+                else:
+                    worksheet.write_number(*data_to_write)
+    workbook.close()
 
 
 def get_name(dirname, separator='_', connector=' '):
@@ -33,6 +51,7 @@ def prepare_for_grading(directory):
 
 
 def list_students(groups, verbose_output=False):
+    all_results = []
     for group in groups:
         if verbose_output:
             print('\n{}:'.format(group))
@@ -48,19 +67,19 @@ def list_students(groups, verbose_output=False):
                 scores = [i * j for i, j in zip(perform_tests(), ex_points)]
                 total_score = sum(scores)
                 grade = total_score / sum(ex_points) * 10
-                # row.extend(scores),
-                # row.extend([total_score, grade])
                 row = [
                     get_name(dir),
                     *scores,
                     total_score,
                     grade
                 ]
+
                 csv_data.append(row)
                 if verbose_output:
                     print('{} got {} points which is {}'.format(get_name(dir), total_score, grade))
-        write_results(group, 'csv', csv_data)
-        write_results(group, 'xls', csv_data, '\t')
+        all_results.append({group: csv_data})
+        write_results_csv(group, 'csv', csv_data)
+    write_results_xlsx(all_results)
 
 
 if __name__ == '__main__':
